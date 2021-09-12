@@ -25,6 +25,8 @@ config_od = Config(dataset_name='openDR')
 bs_utils_od = Basic_Utils(config_od)
 config_cs = Config(dataset_name='CrankSlider')
 bs_utils_cs = Basic_Utils(config_cs)
+config_g = Config(dataset_name='gears')
+bs_utils_g = Basic_Utils(config_g)
 
 class VotingType:
     BB8=0
@@ -79,7 +81,7 @@ def eval_one_frame_pose(
            if ds =='ycb':
                min_msk = min_dis < config.ycb_r_lst[cls_id-1] * 0.8
            else:
-               min_msk = min_dis < config_cs.CrankSlider_r_lst[cls_id-1] * 0.8          #Changed to CrankSlider
+               min_msk = min_dis < config_g.gears_r_lst[cls_id-1] * 0.8          #Changed to gears
            update_msk = (mask > 0) & (msk_closest_ctr == cls_id) & min_msk
            new_msk[update_msk] = msk_closest_ctr[update_msk]
        mask = new_msk
@@ -115,9 +117,9 @@ def eval_one_frame_pose(
                  mesh_ctr = bs_utils.get_ctr(cls_lst[cls_id-1]).reshape(1,3)
                  mesh_kps = np.concatenate((mesh_kps, mesh_ctr), axis=0)
         else:
-            mesh_kps = bs_utils_cs.get_kps(int(cls_id-1), kp_type='farthest_'+str(config_cs.n_keypoints), ds_type='CrankSlider')#changed to CrankSlider
+            mesh_kps = bs_utils_g.get_kps(int(cls_id-1), kp_type='farthest_'+str(config_g.n_keypoints), ds_type='gears')#changed to gears
             if use_ctr:
-                 mesh_ctr = bs_utils_cs.get_ctr(int(cls_id-1), ds_type='CrankSlider').reshape(1,3)
+                 mesh_ctr = bs_utils_g.get_ctr(int(cls_id-1), ds_type='gears').reshape(1,3)
                  mesh_kps = np.concatenate((mesh_kps, mesh_ctr), axis=0)
         mesh_kps = torch.from_numpy(mesh_kps.astype(np.float32)).cuda()
         pred_RT = bs_utils.best_fit_transform(
@@ -171,7 +173,7 @@ def cal_frame_poses(
                if ds =='ycb':
                    min_msk = min_dis < config.ycb_r_lst[cls_id-1] * 0.8
                else:
-                   min_msk = min_dis < config_cs.CrankSlider_r_lst[cls_id-1] * 0.8   #Changed to CrankSlider
+                   min_msk = min_dis < config_g.gears_r_lst[cls_id-1] * 0.8   #Changed to gears from Crankslider
                #min_msk = min_dis < config.ycb_r_lst[cls_id-1] * 0.8
                update_msk = (mask > 0) & (msk_closest_ctr == cls_id) & min_msk
                new_msk[update_msk] = msk_closest_ctr[update_msk]
@@ -209,9 +211,9 @@ def cal_frame_poses(
                     mesh_kps = np.concatenate((mesh_kps, mesh_ctr), axis=0)
 
             else:
-                mesh_kps = bs_utils_od.get_kps(int(cls_id-1), kp_type='farthest_'+str(config_cs.n_keypoints), ds_type='CrankSlider') #changed
+                mesh_kps = bs_utils_od.get_kps(int(cls_id-1), kp_type='farthest_'+str(config_g.n_keypoints), ds_type='gears') #changed
                 if use_ctr:
-                     mesh_ctr = bs_utils_od.get_ctr(int(cls_id-1), ds_type='CrankSlider').reshape(1,3)
+                     mesh_ctr = bs_utils_od.get_ctr(int(cls_id-1), ds_type='gears').reshape(1,3)
                      mesh_kps = np.concatenate((mesh_kps, mesh_ctr), axis=0)
 
 
@@ -238,6 +240,8 @@ def eval_metric(cls_ids, pred_pose_lst, pred_cls_ids, RTs, mask, label, ds):
         n_cls = config_od.n_classes
     elif ds == 'CrankSlider':
         n_cls = config_cs.n_classes
+    elif ds == 'gears':
+        n_cls = config_g.n_classes
     cls_add_dis = [list() for i in range(n_cls)]
     cls_adds_dis = [list() for i in range(n_cls)]
     for icls, cls_id in enumerate(cls_ids):
@@ -257,6 +261,8 @@ def eval_metric(cls_ids, pred_pose_lst, pred_cls_ids, RTs, mask, label, ds):
         elif ds=='openDR':
             mesh_pts = bs_utils.get_pointxyz_cuda(int(cls_id), ds_type=ds).clone()
         elif ds == 'CrankSlider':
+            mesh_pts = bs_utils.get_pointxyz_cuda(int(cls_id), ds_type=ds).clone()
+        elif ds == 'gears':
             mesh_pts = bs_utils.get_pointxyz_cuda(int(cls_id), ds_type=ds).clone()
         add = bs_utils.cal_add_cuda(pred_RT, gt_RT, mesh_pts)
         adds = bs_utils.cal_adds_cuda(pred_RT, gt_RT, mesh_pts)
@@ -418,12 +424,15 @@ class TorchEval():
         elif ds_type=='CrankSlider':
             n_cls = 9
             self.n_cls = 9
+        elif ds_type=='gears':
+            n_cls = 9
+            self.n_cls = 9
         self.cls_add_dis = [list() for i in range(n_cls)]
         self.cls_adds_dis = [list() for i in range(n_cls)]
         self.cls_add_s_dis = [list() for i in range(n_cls)]
         self.sym_cls_ids = []
 
-    def cal_auc(self, ds='CrankSlider'):
+    def cal_auc(self, ds='gears'): #changed to gears as done by crankslider
         add_auc_lst = []
         adds_auc_lst = []
         add_s_auc_lst = []
@@ -435,6 +444,8 @@ class TorchEval():
                self.sym_cls_ids = config_od.od_sym_cls_ids
             elif ds == 'CrankSlider':
                 self.sym_cls_ids = config_cs.CrankSlider_sym_cls_ids
+            elif ds == 'gears':
+                self.sym_cls_ids = config_g.gears_sym_cls_ids
             if (cls_id) in self.sym_cls_ids:
                 self.cls_add_s_dis[cls_id] = self.cls_adds_dis[cls_id]
             else:
@@ -456,6 +467,8 @@ class TorchEval():
                 print(config_od.openDR_cls_lst[i-1])
             elif ds =='CrankSlider':
                 print(config_cs.CrankSlider_cls_lst[i-1])
+            elif ds =='gears':
+                print(config_g.gears_cls_lst[i-1])
             print("***************add:\t", add_auc)
             print("***************adds:\t", adds_auc)
             print("***************add(-s):\t", add_s_auc)
@@ -497,6 +510,13 @@ class TorchEval():
         elif ds=='CrankSlider':
             sv_pth = os.path.join(
                 config_cs.log_eval_dir,
+                'pvn3d_eval_cuda_{}_{}_{}.pkl'.format(
+                    adds_auc_lst[0], add_auc_lst[0], add_s_auc_lst[0]
+                )
+            )
+        elif ds=='gears':
+            sv_pth = os.path.join(
+                config_g.log_eval_dir,
                 'pvn3d_eval_cuda_{}_{}_{}.pkl'.format(
                     adds_auc_lst[0], add_auc_lst[0], add_s_auc_lst[0]
                 )
@@ -553,9 +573,9 @@ class TorchEval():
 
     def eval_pose_parallel(
         self, pclds, rgbs, masks, pred_ctr_ofs, gt_ctr_ofs, labels, cnt,
-        cls_ids, RTs, pred_kp_ofs, min_cnt=20, merge_clus=False, bbox=False, ds='CrankSlider',
+        cls_ids, RTs, pred_kp_ofs, min_cnt=20, merge_clus=False, bbox=False, ds='gears', #changed to gear
         cls_type=None, use_p2d = False, vote_type=VotingType.Farthest,
-        use_ctr_clus_flter=True, use_ctr=True, ds_type="CrankSlider", obj_id=0
+        use_ctr_clus_flter=True, use_ctr=True, ds_type="gears", obj_id=0              #changed to gear
     ):
         bs, n_kps, n_pts, c = pred_kp_ofs.size()
         masks = masks.long()
@@ -568,7 +588,7 @@ class TorchEval():
         use_ctr_clus_flter_lst = [use_ctr_clus_flter for i in range(bs)]
         obj_id_lst = [obj_id for i in range(bs)]
 
-        if ds_type == "ycb" or ds_type=='openDR' or ds_type=='CrankSlider':
+        if ds_type == "ycb" or ds_type=='openDR' or ds_type=='CrankSlider' or ds_type=='gears':
             data_gen = zip(
                 pclds, masks, pred_ctr_ofs, pred_kp_ofs, RTs,
                 cls_ids, use_ctr_lst, n_cls_lst, min_cnt_lst, use_ctr_clus_flter_lst,
@@ -585,7 +605,7 @@ class TorchEval():
         with concurrent.futures.ThreadPoolExecutor(
             max_workers= bs
         ) as executor:
-            if ds_type == "ycb" or ds_type=='openDR' or ds_type =='CrankSlider':
+            if ds_type == "ycb" or ds_type=='openDR' or ds_type =='CrankSlider' or ds_type =='gears':
                 print("Given ds_type: ", str(ds_type))
                 eval_func = eval_one_frame_pose
 

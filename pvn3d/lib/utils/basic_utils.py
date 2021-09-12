@@ -622,6 +622,16 @@ class Basic_Utils():
             self.lm_cls_ptsxyz_dict[cls] = pointxyz
             return pointxyz
 
+        elif ds_type == 'gears':
+            ptxyz_pth = os.path.join('/home/akber/PVN3D/pvn3d/datasets/gears/gears_dataset/models', 'obj_'+str(cls)+'.ply')
+            #pointxyz = self.ply_vtx(ptxyz_pth)
+            pointxyz = np.asarray(pcl.load(ptxyz_pth))
+            dellist = [j for j in range(0, len(pointxyz))]
+            dellist = random.sample(dellist, len(pointxyz) - 2000)
+            pointxyz = np.delete(pointxyz, dellist, axis=0)
+            self.lm_cls_ptsxyz_dict[cls] = pointxyz
+            return pointxyz
+
         else:
             ptxyz_pth = os.path.join(
                 'datasets/linemod/Linemod_preprocessed/models',
@@ -645,7 +655,7 @@ class Basic_Utils():
             self.ycb_cls_ptsxyz_cuda_dict[cls] = ptsxyz_cu
             return ptsxyz_cu.clone()
 
-        elif ds_type == "openDR" or ds_type == "CrankSlider" :
+        elif ds_type == "openDR" or ds_type == "CrankSlider" or ds_type == "gears" :
 
             ptsxyz = self.get_pointxyz(cls, ds_type)
             ptsxyz_cu = torch.from_numpy(ptsxyz.astype(np.float32)).cuda()
@@ -673,6 +683,9 @@ class Basic_Utils():
             elif ds_type == 'CrankSlider':
                 kps = np.loadtxt(self.config.CrankSlider_kps_dir+'/{}/{}.txt'.format(cls+1,kp_type), dtype=np.float32)
                 return kps.copy()
+            elif ds_type == 'gears':
+                kps = np.loadtxt(self.config.gears_kps_dir+'/{}/{}.txt'.format(cls+1,kp_type), dtype=np.float32)
+                return kps.copy()
             else:
                 cls = self.config.lm_id2obj_dict[cls]
         if ds_type == "ycb":
@@ -699,7 +712,7 @@ class Basic_Utils():
         if type(cls) is int:
             if ds_type == 'ycb':
                 cls = self.ycb_cls_lst[cls - 1]
-            elif ds_type == 'openDR' or ds_type == 'CrankSlider':
+            elif ds_type == 'openDR' or ds_type == 'CrankSlider' or ds_type == 'gears':
                 pass
             else:
                 cls = self.config.lm_id2obj_dict[cls]
@@ -723,6 +736,12 @@ class Basic_Utils():
         elif ds_type == 'CrankSlider':
             cor_pattern = os.path.join(
                 self.config.CrankSlider_kps_dir, '{}/corners.txt'.format(cls+1),
+            )
+            cors = np.loadtxt(cor_pattern.format(cls+1), dtype=np.float32)
+            ctr = cors.mean(0)
+        elif ds_type == 'gears':
+            cor_pattern = os.path.join(
+                self.config.gears_kps_dir, '{}/corners.txt'.format(cls+1),
             )
             cors = np.loadtxt(cor_pattern.format(cls+1), dtype=np.float32)
             ctr = cors.mean(0)
@@ -752,7 +771,7 @@ class Basic_Utils():
     ):
         if ds_type == 'ycb':
             cls_nm = self.ycb_cls_lst[cls_id-1]
-        elif ds_type== 'openDR' or ds_type== 'CrankSlider' :
+        elif ds_type== 'openDR' or ds_type== 'CrankSlider' or ds_type== 'gears':
             cls_nm = cls_id
         else:
             cls_nm = self.lm_cls_lst[cls_id-1]

@@ -164,6 +164,41 @@ class Config:
                 'datasets/CrankSlider/test_val_data_pts{}.pkl'.format(self.n_sample_points)
             )
 
+        elif self.dataset_name == 'gears':
+
+            print("inside gears <<<" + str(dataset_name))
+            self.n_objects = 8 + 1
+            self.n_classes = 8 + 1
+            self.gears_cls_lst_p = os.path.abspath(
+                os.path.join(
+                    self.exp_dir, 'datasets/gears/dataset_config/classes.txt'
+                )
+            ) 
+            self.gears_root = os.path.abspath(
+                os.path.join(
+                    self.exp_dir, 'datasets/gears/gears_dataset'
+                )
+            )
+
+            self.gears_kps_dir = os.path.abspath(
+                os.path.join(
+                    self.exp_dir, 'datasets/gears/gears_object_kps'
+                )
+            )
+            gears_r_lst_p = os.path.abspath(
+                os.path.join(
+                    self.exp_dir, 'datasets/gears/dataset_config/radius.txt'
+                )
+            )
+            self.use_preprocess = True
+            self.gears_r_lst = list(np.loadtxt(gears_r_lst_p))
+            self.gears_cls_lst = self.read_lines(self.gears_cls_lst_p)
+            self.gears_sym_cls_ids = [1, 2, 3, 5]
+            self.gears_test_pkl_p = os.path.join(
+                self.exp_dir,
+                'datasets/gears/test_val_data_pts{}.pkl'.format(self.n_sample_points)
+            )
+
         else:
             print("inside linemode <<<" + str(dataset_name))
             self.n_objects = 1 + 1
@@ -238,6 +273,9 @@ class Config:
                                 [0.,        554.25469119,  240.5],
                                 [0.,        0.,         1.]]),
             'CrankSlider': np.array([[554.25469119, 0.,         320.5],
+                                [0.,        554.25469119,  240.5],
+                                [0.,        0.,         1.]]),
+            'gears': np.array([[554.25469119, 0.,         320.5],
                                 [0.,        554.25469119,  240.5],
                                 [0.,        0.,         1.]])
         }
