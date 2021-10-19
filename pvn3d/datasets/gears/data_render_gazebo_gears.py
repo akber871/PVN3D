@@ -88,7 +88,7 @@ def cv_im_fill(bin_im):
 
     return im_out
 
-sample_num = 3071   # set this to 0 at first run
+sample_num = 3072   # set this to 0 at first run
 gt_yaml_dict = {}
 cam_info_msg = rospy.wait_for_message('kinect1/color/camera_info', CameraInfo, timeout = 2)
 
@@ -198,14 +198,14 @@ for dist in np.arange(0.55,1.05,0.125):
                 try:
                      rospy.wait_for_service('gazebo/get_model_state')
                      client = rospy.ServiceProxy('gazebo/get_model_state', getStateGZ)    ### Get model states
-                     resp.append( client('Gear_Helical_15Teeth_2mm', 'world'))    
-                     resp.append( client('Gear_Helical_15Teeth_5mm', 'world'))
-                     resp.append( client('Gear_Helical_30Teeth_2mm', 'world'))
-                     resp.append( client('Gear_Helical_30Teeth_5mm', 'world'))
-                     resp.append( client('Gear_Spur_15Teeth_2mm', 'world'))
-                     resp.append( client('Gear_Spur_15Teeth_5mm', 'world'))
-                     resp.append( client('Gear_Spur_30Teeth_2mm', 'world'))
-                     resp.append( client('Gear_Spur_30Teeth_5mm', 'world'))
+                     resp.append( client('Gear_Helical_12Teeth_20mm', 'world'))    
+                     resp.append( client('Gear_Helical_12Teeth_60mm', 'world'))
+                     resp.append( client('Gear_Helical_30Teeth_20mm', 'world'))
+                     resp.append( client('Gear_Helical_30Teeth_60mm', 'world'))
+                     resp.append( client('Gear_Spur_12Teeth_20mm', 'world'))
+                     resp.append( client('Gear_Spur_12Teeth_60mm', 'world'))
+                     resp.append( client('Gear_Spur_30Teeth_20mm', 'world'))
+                     resp.append( client('Gear_Spur_30Teeth_60mm', 'world'))
 
                 except Exception as inst:
                      print('Error in gazebo/get_link_state service request: ' + str(inst) )
