@@ -1,0 +1,8 @@
+Gear_Helical_12Teeth_20mm
+Gear_Helical_12Teeth_60mm
+Gear_Helical_30Teeth_20mm
+Gear_Helical_30teeth_60mm
+Gear_Spur_12Teeth_20mm
+Gear_Spur_12Teeth_60mm
+Gear_Spur_30Teeth_20mm
+Gear_Spur_30Teeth_60mm
