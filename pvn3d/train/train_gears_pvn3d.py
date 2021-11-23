@@ -6,6 +6,7 @@ from __future__ import (
     unicode_literals,
 )
 import sys
+import os
 #sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import open3d as o3d
 import torch
@@ -318,7 +319,7 @@ class Trainer(object):
 
         def is_to_eval(epoch, it):
             if it < 300 * 100:
-                eval_frequency = 720
+                eval_frequency = 720 #870
             elif it < 400 * 100:
                 eval_frequency = (20 * 100)
             elif it < 500 * 100:
@@ -474,6 +475,7 @@ if __name__ == "__main__":
     lr_scheduler = CyclicLR(
         optimizer, base_lr=1e-5, max_lr=1e-3,
         step_size=config.n_total_epoch * config.num_mini_batch_per_epoch // 6,
+        #step_size_down=config.n_total_epoch * config.num_mini_batch_per_epoch // 6, # Added step_size_down
         mode = 'triangular'
     )
 
