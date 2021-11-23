@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
-sys.path.remove('/opt/ros/melodic/lib/python2.7/dist-packages')
+#sys.path.remove('/opt/ros/melodic/lib/python2.7/dist-packages')
 import cv2
 import sys
 #import pcl
@@ -40,6 +40,7 @@ class gears_Dataset():
             self.obj_dict[cls] = cls_id'''
         self.rng = np.random
         if dataset_name == 'train':
+            print("loading gears training dataset")
             self.add_noise = True
             self.path = 'datasets/gears/gears_dataset/train.txt'
             self.all_lst = bs_utils.read_lines(self.path)
@@ -61,6 +62,7 @@ class gears_Dataset():
             else:
                 self.add_noise = False
                 self.path = 'datasets/gears/gears_dataset/test.txt'
+                print("loading gears testset")                
                 self.all_lst = bs_utils.read_lines(self.path)
         print("{}_dataset_size: ".format(dataset_name), len(self.all_lst))
         self.root = config.gears_root
@@ -229,10 +231,11 @@ class gears_Dataset():
             #   167.34375
             #   200.8125
             #   234.28125
+            #   267.75
             #########################################
 
-
-            for i, val in enumerate([ 33,  67,  100, 134, 167, 201, 234]):
+            # Check gray-scale labels for class objects
+            for i, val in enumerate([ 32,  66,  99, 133, 166, 200, 234, 11 ]):
                 labels[np.where(labels == val )] = i + 1
             rnd_typ = 'syn' if 'syn' in item_name else 'real'
             cam_scale = 1 #meta['factor_depth'].astype(np.float32)[0][0]
@@ -299,7 +302,7 @@ class gears_Dataset():
             opt2cam_R = Rot.from_euler('zyx',[1.57,0,1.57])
             opt2cam_R= opt2cam_R.as_dcm()
 
-            for i, cls_id in enumerate(range(1,8)):
+            for i, cls_id in enumerate(range(1,9)):
                 r = meta['poses'][:, :, i][:, 0:3]
                 r = np.matmul( opt2cam_R, r )
                 t = np.array(meta['poses'][:, :, i][:, 3:4].flatten()[:, None])
@@ -411,7 +414,10 @@ def main():
     ds = {}
     # ds['train'] = openDR_Dataset('train')
     # ds['val'] = openDR_Dataset('validation')
-    ds['test'] = gears_Dataset('test')
+    # ds['test:'] = gears_Dataset('test')
+    ds['train'] = gears_Dataset('train')
+    ds['val'] = gears_Dataset('validation')
+    ds['test:'] = gears_Dataset('test')
     idx = dict(
         train=0,
         val=0,
@@ -419,8 +425,8 @@ def main():
     )
     while True:
         # for cat in ['val', 'test']:
-        for cat in ['test']:
-        # for cat in ['train']:
+        # for cat in ['test']:
+        for cat in ['train']:
             datum = ds[cat].__getitem__(idx[cat])
             idx[cat] += 1
             datum = [item.numpy() for item in datum]
