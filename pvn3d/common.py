@@ -35,9 +35,9 @@ class Config:
 
         self.n_total_epoch = 25
         self.mini_batch_size = 20
-        self.num_mini_batch_per_epoch = 87 # 4000
+        self.num_mini_batch_per_epoch = 81 #87 # 4000
         self.val_mini_batch_size = 20
-        self.val_num_mini_batch_per_epoch = 30 # 125
+        self.val_num_mini_batch_per_epoch = 20 #30 # 125
         self.test_mini_batch_size = 1
 
         self.n_sample_points = 8192 + 4096
