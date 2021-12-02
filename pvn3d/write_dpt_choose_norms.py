@@ -1,5 +1,5 @@
 import sys
-sys.path.remove('/opt/ros/melodic/lib/python2.7/dist-packages')		#This is to remove ROS-python from the PYTHONPATH which messes up the Python 3 env this project works with
+#sys.path.remove('/opt/ros/melodic/lib/python2.7/dist-packages')		#This is to remove ROS-python from the PYTHONPATH which messes up the Python 3 env this project works with
 from lib.utils.basic_utils import Basic_Utils
 from common import Config
 import numpy as np
