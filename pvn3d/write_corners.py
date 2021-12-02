@@ -1,6 +1,6 @@
 import sys
 import lib.utils.pcl_helper as pch
-sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')		#This is to remove ROS-python from the PYTHONPATH which messes up the Python 3 env this project works with
+#sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')		#This is to remove ROS-python from the PYTHONPATH which messes up the Python 3 env this project works with
 import pcl
 import lib.utils.basic_utils as bs_utl
 import numpy as np
