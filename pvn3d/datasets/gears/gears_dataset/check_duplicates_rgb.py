@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 mean1 = 0
-for i in range(0, 2122):
+for i in range(0, 2026):
 	
 	try:
 		a = cv2.imread('./rgb/'+str(i)+'.png', -1)
