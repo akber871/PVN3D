@@ -5,7 +5,7 @@ train_file.truncate()
 test_file.truncate()
 
 j=0
-for i in range(0,2122):
+for i in range(0,2027):
 	
 	if j<4:
 		train_file.write(str(i)+'\n')
