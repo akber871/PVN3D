@@ -7,8 +7,8 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 import scipy.io as sio
 
-mat = np.zeros((3,4,8,2121))
-for i in range(0,2121):
+mat = np.zeros((3,4,8,2027))
+for i in range(0,2027):
 	mat[:,:,:,i] = sio.loadmat('./meta/'+str(i)+'-meta.mat')['poses']
 
 rospy.init_node('gt_pub')
